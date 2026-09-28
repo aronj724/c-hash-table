@@ -15,9 +15,21 @@ destroy one. Although it doesn't do much at this point, we can still try it out.
 */
 
 #include "hash_table.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+int hash(char *string, int num_buckets) {
+  double hash = 0;
+  int prime_num = 151;
+  int str_len = strlen(string);
+  for (int i = 0; i < str_len; i++) {
+    hash +=
+        pow((double)prime_num, (double)(str_len - i - 1)) * (int)(string[i]);
+  }
+  return (int)fmod(hash, (double)num_buckets);
+}
 
 /*
 Given a key string and value string this function creates an ht_item
@@ -33,7 +45,9 @@ void create_ht_item(char *key, char *value, hash_table *table) {
   printf("completed\n");
   item->key = key_string;
   item->value = value_string;
-  table->items[table->size] = item;
+  int index = hash(item->key, table->capacity);
+  printf("This is the index: %d\n", index);
+  table->items[index] = item;
   table->size++;
 };
 
@@ -56,9 +70,14 @@ void delete_ht_item(ht_item *item) {
 }
 
 void delete_hash_table(hash_table *table) {
-  for (int i = 0; i < table->size; i++) {
-    delete_ht_item(table->items[i]);
+  for (int i = 0; i < table->capacity; i++) {
+    if (table->items[i] != NULL) {
+      delete_ht_item(table->items[i]);
+    }
   }
   free(table->items);
   free(table);
+  char *string = "cat";
+  int num = 53;
+  printf("This is the index: %d\n", hash(string, num));
 }

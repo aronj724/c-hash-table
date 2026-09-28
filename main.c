@@ -9,8 +9,6 @@ int main() {
   char *str1 = "hello";
   char *str2 = "bye";
   create_ht_item(str1, str2, table);
-  printf("Key of the table: %s\n", table->items[0]->key);
-  printf("Value of the table: %s\n", table->items[0]->value);
   delete_hash_table(table);
   return 0;
 }

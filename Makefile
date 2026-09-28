@@ -4,7 +4,7 @@ OBJS = hash_table.o main.o
 PROGRAM = program
 
 $(PROGRAM) : $(OBJS)
-	$(CC) -o $(PROGRAM) $^
+	$(CC) -o $(PROGRAM) $^ -lm
 
 hash_table.o : hash_table.h hash_table.c
 	$(CC) $(CCFLAGS) hash_table.c
