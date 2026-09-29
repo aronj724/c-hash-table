@@ -1,26 +1,10 @@
-/*
-1.We need to define initialisation functions for ht_items. This function
-allocates a chunk of memory the size of an ht_item, and saves a copy of the
-strings k and v in the new chunk of memory. The function is marked as static
-because it will only ever be called by code internal to the hash table.
-2. ht_new initialises a new hash table. size defines how many items we can
-store. This is fixed at 53 for now. We'll expand this in the section on
-resizing. We initialise the array of items with calloc, which fills the
-allocated memory with NULL bytes. A NULL entry in the array indicates that the
-bucket is empty.
-3. We also need functions for deleting ht_items and ht_hash_tables, which free
-the memory we've allocated, so we don't cause memory leaks.
-4. We have written code which defines a hash table, and lets us create and
-destroy one. Although it doesn't do much at this point, we can still try it out.
-*/
-
 #include "hash_table.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-int hash(char *string, int num_buckets) {
+int hash_a(char *string, int num_buckets) {
   double hash = 0;
   int prime_num = 151;
   int str_len = strlen(string);
@@ -31,6 +15,16 @@ int hash(char *string, int num_buckets) {
   return (int)fmod(hash, (double)num_buckets);
 }
 
+int hash_b(char *string, int num_buckets) {
+  double hash = 0;
+  int prime_num = 307;
+  int str_len = strlen(string);
+  for (int i = 0; i < str_len; i++) {
+    hash +=
+        pow((double)prime_num, (double)(str_len - i - 1)) * (int)(string[i]);
+  }
+  return (int)fmod(hash, (double)num_buckets);
+}
 /*
 Given a key string and value string this function creates an ht_item
 */
@@ -45,7 +39,16 @@ void create_ht_item(char *key, char *value, hash_table *table) {
   printf("completed\n");
   item->key = key_string;
   item->value = value_string;
-  int index = hash(item->key, table->capacity);
+  int index = -1;
+  int iteration = 0;
+  printf("New key: %s\n", item->key);
+  do {
+    index = (hash_a(item->key, table->capacity) +
+             iteration * (hash_b(item->key, table->capacity) + 1)) %
+            table->capacity;
+    printf("This is attempt %d: Index is %d\n", iteration, index);
+    iteration++;
+  } while (table->items[index] != NULL);
   printf("This is the index: %d\n", index);
   table->items[index] = item;
   table->size++;
@@ -79,5 +82,5 @@ void delete_hash_table(hash_table *table) {
   free(table);
   char *string = "cat";
   int num = 53;
-  printf("This is the index: %d\n", hash(string, num));
+  printf("This is the index: %d\n", hash_a(string, num));
 }
